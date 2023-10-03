@@ -196,3 +196,198 @@ function appendItem(todo) {
 - `div` 태그에 해당하는 `item` 변수를 생성한다. 이 `item` 변수는 인자로 받은 투두 객체를 화면에 표시할 때 사용된다.
 - `item` 변수의 `className` 프로퍼티에 `item`을 할당한다. 즉 `div` 요소의 클래스 이름을 `item`으로 설정한다.
 - `item` 변수의 `innerHTML` 프로퍼티에 투두 객체의 내용과 버튼을 추가한다.
+    - 투두 객체의 내용은 `${todo.content}`로 표시한다.
+    - 버튼은 `span` 태그로 감싸서 표시한다. 이렇게 하면 버튼이 한 줄에 표시된다.
+
+#### `span` vs `div`
+
+두 버튼을 `span` 태그로 감싸서 표시했다. `span` 태그는 인라인 요소이다. 즉, `div` 태그와 달리 한 줄에 표시된다. `div` 태그는 블록 요소이다. 즉, `span` 태그와 달리 한 줄을 다 차지한다.
+
+### `toggleDone(id)` 함수
+
+```js
+function toggleDone(id) {
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    const index = todos.findIndex(todo => todo.id === id);
+
+    if (index === -1) return;
+    todos[index].done = !todos[index].done;
+
+    localStorage.setItem('todos', JSON.stringify(todos));
+
+    renderTodos();
+}
+```
+
+- 로컬 스토리지에서 `todos` 키로 문자열 값을 가져와서 JSON으로 파싱한다. 만약 값이 존재하지 않거나 파싱 에러가 발생하면 빈 배열을 반환한다.
+- `findIndex()` 메서드를 사용하여 주어진 조건에 맞는 요소의 인덱스를 반환한다. 만약 조건에 맞는 요소가 없다면 -1을 반환한다.
+- 만약 인덱스가 -1이라면 함수를 리턴한다.
+- 인덱스가 -1이 아니라면 해당 인덱스의 `done` 프로퍼티를 반전시킨다. (`true` <-> `false`)
+- 로컬 스토리지에 `todos` 키로 문자열 값을 저장한다. 이때 `JSON.stringify()` 메서드를 사용하여 문자열로 변환한다.
+- `renderTodos()` 함수를 호출하여 화면을 다시 렌더링한다.
+
+### `deleteItem(id)` 함수
+
+```js
+function deleteItem(id) {
+    let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+    todos = todos.filter(todo => todo.id !== id);
+    localStorage.setItem('todos', JSON.stringify(todos));
+
+    renderTodos();
+}
+```
+
+- 로컬 스토리지에서 `todos` 키로 문자열 값을 가져와서 JSON으로 파싱한다. 만약 값이 존재하지 않거나 파싱 에러가 발생하면 빈 배열을 반환한다.
+- `filter()` 메서드를 사용하여 주어진 조건에 맞는 요소만 추출한다. 즉, `id`가 일치하지 않는 요소만 추출한다.
+- 로컬 스토리지에 `todos` 키로 문자열 값을 저장한다. 이때 `JSON.stringify()` 메서드를 사용하여 문자열로 변환한다.
+- `renderTodos()` 함수를 호출하여 화면을 다시 렌더링한다.
+
+### `renderTodos()` 함수
+
+```js
+function saveToLocalStorage(todo) {
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    todos.push(todo);
+    localStorage.setItem('todos', JSON.stringify(todos));
+}
+```
+- 로컬 스토리지에서 `todos` 키로 문자열 값을 가져와서 JSON으로 파싱한다. 만약 값이 존재하지 않거나 파싱 에러가 발생하면 빈 배열을 반환한다.
+- `push()` 메서드를 사용하여 새로운 투두 객체를 배열에 추가한다.
+- 로컬 스토리지에 `todos` 키로 문자열 값을 저장한다. 이때 `JSON.stringify()` 메서드를 사용하여 문자열로 변환한다.
+
+### `loadFromLocalStorage()` 함수
+
+```js
+function loadFromLocalStorage() {
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    todos.forEach(todo => appendItem(todo));
+}
+```
+
+- 로컬 스토리지에서 `todos` 키로 문자열 값을 가져와서 JSON으로 파싱한다. 만약 값이 존재하지 않거나 파싱 에러가 발생하면 빈 배열을 반환한다.
+- `forEach()` 메서드를 사용하여 배열의 모든 요소에 대해 `appendItem()` 함수를 호출한다.
+
+### `renderTodos()` 함수
+
+```js
+function renderTodos() {
+    document.getElementById('todoBlock').innerHTML = "<h3>Todo</h3>";
+    document.getElementById('doneBlock').innerHTML = "<h3>Done</h3>";
+    loadFromLocalStorage();
+}
+```
+
+- `todoBlock`과 `doneBlock`의 `innerHTML`을 초기화한다.
+- `loadFromLocalStorage()` 함수를 호출하여 화면을 다시 렌더링한다.
+
+
+## 리팩토링 해보기
+
+### `appendItem(todo)` 함수
+
+#### 기존 방식의 문제점
+
+크게 두 가지 문제점이 있다.
+
+1. `innerHTML` 방식을 사용하고 있다.
+    - 해당 방식은 DOM을 직접적으로 수정한다. 즉 DOM을 수정할 때마다 DOM 트리를 다시 재구성한다. 즉 다시 렌더링하는 것이다. 규모가 크다면 성능 이슈가 발생할 수 있다.
+2. 인라인 이벤트 핸들러를 사용하고 있다. 
+    - HTML과 JS는 관심사가 다르므로 분리해야 한다.
+
+2번보다는 1번이 가장 큰 문제점이다. 따라서 `item.innerHTML` 대신 `item.appendChild()`를 사용하고, 인라인 이벤트 핸들러 대신 `addEventListener()`를 사용하도록 리팩토링하자.
+
+```js
+function appendItem(todo) {
+    const block = todo.done ? document.getElementById('doneBlock') : document.getElementById('todoBlock');
+    const item = document.createElement('div');
+
+    item.className = 'item';
+    
+    // 투두 내용 추가
+    const content = document.createElement('div');
+    content.className = 'content';
+    content.innerText = todo.content;
+    item.appendChild(content);
+
+    // span 태그 추가
+    const span = document.createElement('span');
+
+    // 투두 토글 버튼 추가
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'toggleBtn';
+    toggleBtn.innerText = todo.done ? '⏪' : '✅';
+    toggleBtn.addEventListener('click', () => toggleDone(todo.id));
+    span.appendChild(toggleBtn);
+
+    // 투두 삭제 버튼 추가
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'deleteBtn';
+    deleteBtn.innerText = '❌';
+    deleteBtn.addEventListener('click', () => deleteItem(todo.id));
+    span.appendChild(deleteBtn);
+
+    item.appendChild(span);
+    block.appendChild(item);
+}
+```
+
+몇 가지 변경점이 있다. 기존에는 텍스트 노드였다면 투두의 내용을 div 안에 감싸도록 수정했다. 그리고 done 값에 따라 롤백 이모지와 체크 이모지를 다르게 표시하도록 수정했다. 그리고 버튼을 생성하고 이벤트 리스너를 추가했다. 마지막으로 `item`에 `content`와 `span`을 추가했다.
+
+## 그 외 개선해보면 좋을 점
+
+매번 함수에서 로컬 스토리지에서 `todos` 키로 문자열 값을 가져와서 JSON으로 파싱하는 로직이 중복되어 있다. 뭔가 이러한 상태 값의 경우 중앙에서 관리하고... 변경될 때마다 업데이트하면 어떨까?
+
+```js
+const state = {
+    todos: JSON.parse(localStorage.getItem('todos')) || []
+};
+```
+
+중앙에 이런 식으로 상태를 배치하고...
+
+```js
+function addTodoToState(todo) {
+    state.todos.push(todo);
+    updateLocalStorage();
+    renderTodo(todo);
+}
+```
+
+이런 식으로 상태를 업데이트하는 것이다.
+
+렌더링 로직도 전체가 아닌 부분만 업데이트 되도록 최적화해보면 어떨까?
+
+```js
+function renderTodo(todo) {
+    const block = todo.done ? document.getElementById('doneBlock') : document.getElementById('todoBlock');
+    const item = createTodoElement(todo);
+    block.appendChild(item);
+}
+
+function renderTodos() {
+    document.getElementById('todoBlock').innerHTML = '';
+    document.getElementById('doneBlock').innerHTML = '';
+    state.todos.forEach(todo => renderTodo(todo));
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    renderTodos();
+    ...
+}
+```
+
+모든 투두를 렌더링하는 함수와 각각의 투두를 렌더링하는 함수를 분리했다.
+
+실제로는 이렇게 사용될 것이다.
+
+```js
+function addTodoToState(todo) {
+    state.todos.push(todo);
+    updateLocalStorage();
+    renderTodo(todo);
+}
+```
+
+느낌적인 부분으로만 잡아봤고 시간이 없어서 구현은 하지 못했다. 나중에 기회가 된다면 리팩토링 해보는 것으로 하자.

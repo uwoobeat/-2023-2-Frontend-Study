@@ -26,14 +26,31 @@ function appendItem(todo) {
     const item = document.createElement('div');
 
     item.className = 'item';
-    item.innerHTML = `
-        ${todo.content}
-        <span>
-            <button onclick="toggleDone(${todo.id})">↔️</button>
-            <button onclick="deleteItem(${todo.id})">❌</button>
-        </span>
-    `;
+    
+    // 투두 내용 추가
+    const content = document.createElement('div');
+    content.className = 'content';
+    content.innerText = todo.content;
+    item.appendChild(content);
 
+    // span 태그 추가
+    const span = document.createElement('span');
+
+    // 투두 토글 버튼 추가
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'toggleBtn';
+    toggleBtn.innerText = todo.done ? '⏪' : '✅';
+    toggleBtn.addEventListener('click', () => toggleDone(todo.id));
+    span.appendChild(toggleBtn);
+
+    // 투두 삭제 버튼 추가
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'deleteBtn';
+    deleteBtn.innerText = '❌';
+    deleteBtn.addEventListener('click', () => deleteItem(todo.id));
+    span.appendChild(deleteBtn);
+
+    item.appendChild(span);
     block.appendChild(item);
 }
 
