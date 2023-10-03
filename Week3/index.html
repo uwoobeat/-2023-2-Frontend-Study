@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Uwoobeat Todo List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>Todo List Demo</h1>
+        <div class="content">
+            <div class="block" id="inputBlock">
+                <form onsubmit="return false;">
+                    <input type="text" id="newTask" placeholder="Enter your to-do here!">
+                    <button id="addTaskBtn">+</button>
+                </form>
+            </div>
+            <div class="block" id="todoBlock">
+                <h3>todo</h3>
+            </div>
+            <div class="block" id="doneBlock">
+                <h3>done</h3>   
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

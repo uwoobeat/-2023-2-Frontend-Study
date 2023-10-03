@@ -1,0 +1,28 @@
+body {
+    font-family: 'Noto Sans', sans-serif; /* Noto sans를 사용, 사용할 수 없으면 sans-serif 사용 */
+    display: flex; /* flexbox 사용 */
+    flex-direction: column; /* flexbox를 세로로 쌓음 */
+    align-items: center; /* 가운데 정렬 */
+    padding-top: 50px; /* 상단에 50px 패딩 추가*/
+}
+
+.container {
+    width: 300px; /* 전체 내용을 포함하는 컨테이너 요소의 너비를 설정 */
+}
+
+.block {
+    margin-bottom: 15px; /* 블록 요소 (input, todo, done) 사이에 15px 마진 추가 */
+}
+
+button {
+    cursor: pointer; /* 버튼 위 커서를 손가락 모양으로 변경 */
+}
+
+.item {
+    display: flex; /* flexbox 사용하여 요소 배치 */
+    justify-content: space-between; /* 요소 사이에 공간을 균등하게 배치 */
+    margin-bottom: 10px; /* 아이템 아래에 10px 마진 추가 */
+    padding: 5px; /* 아이템 내부에 5px 패딩 추가 (컨텐츠와 경계 간 간격) */
+    border: 1px solid #eee; /* 아이템 경계에 1px 실선 추가 */
+    background-color: azure; /* 아이템 배경색을 azure로 설정 */
+}
